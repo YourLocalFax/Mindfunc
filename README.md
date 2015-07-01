@@ -14,15 +14,21 @@ Every value in mindfunc is technically a consumer, a function that doesn't retur
 
 A consumer is called simply using its variable identifier. For example, if we'd like to call the ''+'' consumer, simply:
 
-```+```
+```
++
+```
 
 To pass arguments to consumers, we use a '';'' separator. If a consumer ''2'' exists that accepts 1 argument, we could call it like:
 
-```2;+```
+```
+2;+
+```
 
 Consumers can also be composed, but only as arguments to other consumers. This is done by enclosing a call in parenthesis in the argument list. For example, if a consumer ''r'' exists that moves the pointer right twice and then calls it's first argument, we can use our previous ''2;+'' as a composition to specify that we want to increment that memory slot twice.
 
-```r;(2;+)```
+```
+r;(2;+)
+```
 
 ###Built-ins
 
@@ -60,19 +66,25 @@ While ''['' and '']'' behave the same in mindfunc as in brainfuck, they are not 
 
 Consumers can be declared in mindfunc with the following syntax:
 
-```((args)namebody)```
+```
+((args)namebody)
+```
 
 OR (much prettier and easier to see):
 
-```( (args)name
+```
+( (args)name
   body
-)```
+)
+```
 
 where ''args'' is every argument identifier with no separation (note that the arg list is optional, if a consumer accepts no arguments the ''()'' can be omitted altogether), ''name'' is the single-character identifier for this consumer , and ''body'' is the body of the consumer . As an example, let's write the consumer ''r'' we mentioned earlier.
 
-```( (f)r
+```
+( (f)r
   >>f
-)```
+)
+```
 
 There! We've defined a consumer ''r'' which takes one argument ''f''. The consumer moves the memory pointer right twice and calls the argument consumer ''f''.
 
@@ -82,19 +94,25 @@ Mindfunc also allows anonymous consumers, or ''lambdas''. A lambda is not given 
 
 Lambdas are declared inside of curly braces ''{}'':
 
-```{(args)body}```
+```
+{(args)body}
+```
 
 OR:
 
-```{ (args)
+```
+{ (args)
   body
-}```
+}
+```
 
 This only differs from normal consumer declaration where curly braces are used and the identifier name is omitted.
 
 Now lets use a lambda to tell ''r'' what to do after it moves us right twice:
 
- r;{++}
+```
+r;{++}
+```
 
 Now, when ''r'' calls it's ''f'' parameter, it's calling our lambda that will increment the memory cell twice.
 
