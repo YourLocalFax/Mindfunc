@@ -34,13 +34,13 @@ r;(2;+)
 
 Mindfunc provides consumers for all brainfuck operations, plus the *#* consumer.
 
-- **>** |Move the pointer to the right
-- **<** |Move the pointer to the left
-- **+** |Increment the memory cell under the pointer
-- **-** |Decrement the memory cell under the pointer
-- **#** |Output the number stored in the cell at the pointer
-- **.** |Output the character signified by the cell at the pointer
-- **,** |Input a number and store it in the cell at the pointer
+- `>` Move the pointer to the right
+- `<` Move the pointer to the left
+- `+` Increment the memory cell under the pointer
+- `-` Decrement the memory cell under the pointer
+- `#` Output the number stored in the cell at the pointer
+- `.` Output the character signified by the cell at the pointer
+- `,` Input a number and store it in the cell at the pointer
 
 While *[* and *]* behave the same in mindfunc as in brainfuck, they are not considered consumers. The implementation can decide how to handle these.
 
