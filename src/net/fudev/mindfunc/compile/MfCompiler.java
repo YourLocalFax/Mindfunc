@@ -70,8 +70,14 @@ public class MfCompiler
          case '(':
             visitFnDef();
             break;
+         case '{':
+            visitLambda(true);
+            break;
          default:
-            visitFnCall();
+            final char name = token;
+            CUtil.checkValidName(name);
+            lex(); // name
+            visitFnCall(name);
       }
    }
    
@@ -98,6 +104,38 @@ public class MfCompiler
       lex();
    }
    
+   private int getFn()
+   {
+      if (token == '{')
+      {
+         visitLambda(false);
+      }
+      else
+      {
+         CUtil.checkValidName(token);
+         builder.visitGetFunction(token);
+         lex(); // name
+      }
+      int args = 0;
+      while (token == ';')
+      {
+         lex(); // ;
+         args++;
+         if (token == '(')
+         {
+            lex();
+            visitFnComp();
+            expect(')');
+         }
+         else
+         {
+            builder.visitGetFunction(token);
+            lex();
+         }
+      }
+      return args;
+   }
+   
    private void visitLoop()
    {
       lex(); // [
@@ -112,12 +150,8 @@ public class MfCompiler
       builder.setOpSB(jmptob, jmptoe - jmptob);
    }
    
-   private void visitFnCall()
+   private void visitFnCall(final char name)
    {
-      final char name = token;
-      CUtil.checkValidName(name);
-      lex(); // name
-      final int localPos = builder.getLocal(name);
       int args = 0;
       while (token == ';')
       {
@@ -129,48 +163,40 @@ public class MfCompiler
             visitFnComp();
             expect(')');
          }
+         else if (token == '{')
+         {
+            visitLambda(false);
+         }
          else
          {
             builder.visitGetFunction(token);
             lex(); // name
          }
       }
-      if (localPos == -1)
+      if (name == '\0')
       {
-         builder.visitOpInvokeGlobal(args, name);
+         builder.visitOpInvokeConsumer(args);
       }
       else
       {
-         builder.visitOpInvokeLocal(args, localPos);
+         final int localPos = builder.getLocal(name);
+         if (localPos == -1)
+         {
+            builder.visitOpInvokeGlobal(args, name);
+         }
+         else
+         {
+            builder.visitOpInvokeLocal(args, localPos);
+         }
       }
    }
    
    private void visitFnComp()
    {
-      final char name = token;
-      CUtil.checkValidName(name);
-      builder.visitGetFunction(name);
-      lex(); // name
-      int args = 0;
-      while (token == ';')
-      {
-         lex(); // ;
-         args++;
-         if (token == '(')
-         {
-            lex();
-            visitFnComp();
-            expect(')');
-         }
-         else
-         {
-            builder.visitGetFunction(token);
-            lex();
-         }
-      }
+      final int args = getFn();
       if (args != 0)
       {
-         builder.visitOpComp(args);
+         builder.visitOpCompose(args);
       }
    }
    
@@ -188,24 +214,47 @@ public class MfCompiler
          }
          lex(); // ')'
       }
-      if (token != ')')
+      final char name = token;
+      CUtil.checkValidName(name);
+      lex();
+      while (token != ')')
       {
-         final char name = token;
+         statement();
+      }
+      builder.visitOpEnd();
+      lex(); // )
+      final int func = builder.parent.addNestedFunction(builder);
+      builder = builder.parent;
+      builder.visitOpConsumer(func);
+      builder.visitOpStoreLocal(builder.addLocal(name));
+   }
+   
+   private void visitLambda(final boolean first)
+   {
+      builder = new MfPrototypeBuilder(builder);
+      lex(); // {
+      if (token == '(')
+      {
          lex();
          while (token != ')')
          {
-            statement();
+            builder.addParam(token);
+            lex();
          }
-         builder.visitOpEnd();
-         lex();
-         final int func = builder.parent.addNestedFunction(builder);
-         builder = builder.parent;
-         builder.visitOpStoreLocal(builder.addLocal(name), func);
+         lex(); // ')'
       }
-      else
+      while (token != '}')
       {
-         lex();
-         builder = builder.parent;
+         statement();
+      }
+      builder.visitOpEnd();
+      lex(); // }
+      final int func = builder.parent.addNestedFunction(builder);
+      builder = builder.parent;
+      builder.visitOpConsumer(func);
+      if (first && token == ';')
+      {
+         visitFnCall('\0');
       }
    }
 }

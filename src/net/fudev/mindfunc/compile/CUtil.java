@@ -43,6 +43,9 @@ final class CUtil
          case ')':
          case '[':
          case ']':
+         case '{':
+         case '}':
+         case ';':
             throw new IllegalArgumentException(name + " is not a valid name.");
          default:
       }

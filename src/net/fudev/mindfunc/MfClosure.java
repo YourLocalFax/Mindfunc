@@ -104,6 +104,27 @@ public class MfClosure implements MfFunction
             {
                break loop;
             }
+            case Mindfunc.OP_CON:
+            {
+               final MfPrototype proto = nested[b];
+               final MfClosure closure = new MfClosure(proto);
+               final UpValueInfo[] protoUps = proto.ups;
+               final int upCount = protoUps.length;
+               for (temp = 0; temp < upCount; temp++)
+               {
+                  if (protoUps[temp].type == UpValueInfo.LOCAL)
+                  {
+                     closure.ups[temp] = findUpValue(locals, protoUps[temp].pos, openUps);
+                  }
+                  else
+                  {
+                     closure.ups[temp] = ups[protoUps[temp].pos];
+                  }
+               }
+               closure.state = state;
+               stack[top++] = closure;
+               continue;
+            }
             case Mindfunc.OP_IGL:
             {
                final MfFunction fn = state.getFunction((char) b);
@@ -124,6 +145,13 @@ public class MfClosure implements MfFunction
                }
                continue;
             }
+            case Mindfunc.OP_ICN:
+            {
+               temp = top;
+               final MfFunction[] args = Arrays.copyOfRange(stack, top -= a, temp);
+               stack[--top].invoke(args);
+               continue;
+            }
             case Mindfunc.OP_GET:
             {
                stack[top++] = state.getFunction((char) b);
@@ -131,23 +159,7 @@ public class MfClosure implements MfFunction
             }
             case Mindfunc.OP_STO:
             {
-               final MfPrototype proto = nested[b];
-               final MfClosure closure = new MfClosure(proto);
-               final UpValueInfo[] protoUps = proto.ups;
-               final int upCount = protoUps.length;
-               for (temp = 0; temp < upCount; temp++)
-               {
-                  if (protoUps[temp].type == UpValueInfo.LOCAL)
-                  {
-                     closure.ups[temp] = findUpValue(locals, protoUps[temp].pos, openUps);
-                  }
-                  else
-                  {
-                     closure.ups[temp] = ups[protoUps[temp].pos];
-                  }
-               }
-               closure.state = state;
-               locals[a] = closure;
+               locals[a] = stack[--top];
                continue;
             }
             case Mindfunc.OP_LOD:

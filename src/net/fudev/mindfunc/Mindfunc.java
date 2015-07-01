@@ -48,14 +48,16 @@ public final class Mindfunc
    public static final int MASK_NA = ~MASK_A;
    
    public static final int OP_END = 0x0;
-   public static final int OP_IGL = 0x1;
-   public static final int OP_ILC = 0x2;
-   public static final int OP_GET = 0x3;
-   public static final int OP_STO = 0x4;
-   public static final int OP_LOD = 0x5;
-   public static final int OP_JMP = 0x6;
-   public static final int OP_CLS = 0x7;
-   public static final int OP_CMP = 0x8;
+   public static final int OP_CON = 0x1;
+   public static final int OP_IGL = 0x2;
+   public static final int OP_ILC = 0x3;
+   public static final int OP_ICN = 0x4;
+   public static final int OP_GET = 0x5;
+   public static final int OP_STO = 0x6;
+   public static final int OP_LOD = 0x7;
+   public static final int OP_JMP = 0x8;
+   public static final int OP_CLS = 0x9;
+   public static final int OP_CMP = 0xA;
    
    private Mindfunc()
    {

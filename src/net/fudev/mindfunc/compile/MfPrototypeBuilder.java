@@ -328,6 +328,13 @@ class MfPrototypeBuilder
       return getCurrentPos();
    }
    
+   public int visitOpConsumer(final int bNested)
+   {
+      increaseStackSize();
+      visitOpB(Mindfunc.OP_CON, bNested);
+      return getCurrentPos();
+   }
+   
    public int visitOpInvokeGlobal(final int aArguments, final char bName)
    {
       changeStackSize(-aArguments);
@@ -342,6 +349,13 @@ class MfPrototypeBuilder
       return getCurrentPos();
    }
    
+   public int visitOpInvokeConsumer(final int aArguments)
+   {
+      changeStackSize(-aArguments);
+      visitOpA(Mindfunc.OP_ICN, aArguments);
+      return getCurrentPos();
+   }
+   
    public int visitOpGetGlobal(final char bName)
    {
       increaseStackSize();
@@ -349,9 +363,10 @@ class MfPrototypeBuilder
       return getCurrentPos();
    }
    
-   public int visitOpStoreLocal(final int aLocalPosition, final int bNested)
+   public int visitOpStoreLocal(final int aLocalPosition)
    {
-      visitOpAB(Mindfunc.OP_STO, aLocalPosition, bNested);
+      decreaseStackSize();
+      visitOpA(Mindfunc.OP_STO, aLocalPosition);
       return getCurrentPos();
    }
    
@@ -374,7 +389,7 @@ class MfPrototypeBuilder
       return getCurrentPos();
    }
    
-   public int visitOpComp(final int aArguments)
+   public int visitOpCompose(final int aArguments)
    {
       changeStackSize(-aArguments);
       visitOpA(Mindfunc.OP_CMP, aArguments);
